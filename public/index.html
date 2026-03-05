@@ -8,42 +8,91 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet" />
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             color: #fff;
+            background: #0a0a1a;
+            background-image:
+                radial-gradient(ellipse 80% 60% at 20% 10%, rgba(99, 102, 241, 0.25) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 80% 90%, rgba(236, 72, 153, 0.2) 0%, transparent 55%),
+                radial-gradient(ellipse 50% 40% at 50% 50%, rgba(16, 185, 129, 0.08) 0%, transparent 60%);
         }
+
         .card {
-            background: rgba(255,255,255,0.08);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 28px;
             padding: 48px 40px;
             text-align: center;
             width: 100%;
             max-width: 420px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            box-shadow:
+                0 0 0 1px rgba(99, 102, 241, 0.1),
+                0 24px 64px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
-        h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 6px; }
-        .subtitle { color: rgba(255,255,255,0.55); font-size: 0.9rem; margin-bottom: 36px; }
+
+        h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            background: linear-gradient(135deg, #fff 30%, #a5b4fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.45);
+            font-size: 0.88rem;
+            margin-bottom: 36px;
+        }
 
         #latest-display {
-            background: rgba(255,255,255,0.05);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 32px;
+            background: rgba(99, 102, 241, 0.08);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 18px;
+            padding: 22px 20px;
+            margin-bottom: 28px;
+            position: relative;
+            overflow: hidden;
         }
-        #latest-display p { font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
+
+        #latest-display::before {
+            content: '';
+            position: absolute;
+            top: -30px; left: 50%;
+            transform: translateX(-50%);
+            width: 140px; height: 60px;
+            background: rgba(99, 102, 241, 0.15);
+            border-radius: 50%;
+            filter: blur(20px);
+        }
+
+        #latest-display p {
+            font-size: 0.72rem;
+            color: rgba(165, 180, 252, 0.7);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
         #latest-number {
-            font-size: 3rem;
+            font-size: 3.2rem;
             font-weight: 900;
-            color: #7dd3fc;
-            letter-spacing: 4px;
+            background: linear-gradient(135deg, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 5px;
         }
 
         .btn {
@@ -51,48 +100,90 @@
             width: 100%;
             padding: 16px;
             border: none;
-            border-radius: 14px;
+            border-radius: 16px;
             font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
-            transition: transform 0.15s, box-shadow 0.15s;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
         }
+
         .btn-primary {
-            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
             color: #fff;
-            box-shadow: 0 8px 24px rgba(99,102,241,0.45);
+            box-shadow:
+                0 8px 32px rgba(99, 102, 241, 0.4),
+                0 2px 8px rgba(0, 0, 0, 0.3);
         }
-        .btn-primary:hover    { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(99,102,241,0.55); }
-        .btn-primary:active   { transform: translateY(0); }
-        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow:
+                0 14px 40px rgba(99, 102, 241, 0.55),
+                0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-primary:hover::before { opacity: 1; }
+        .btn-primary:active { transform: translateY(0); }
+        .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
 
         #result {
-            margin-top: 28px;
-            padding: 20px;
-            border-radius: 16px;
-            background: rgba(99,102,241,0.15);
-            border: 1px solid rgba(99,102,241,0.3);
+            margin-top: 24px;
+            padding: 22px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(236,72,153,0.08));
+            border: 1px solid rgba(165, 180, 252, 0.2);
             display: none;
         }
+
         #result .queue-num {
             font-size: 4rem;
             font-weight: 900;
-            color: #a5b4fc;
             display: block;
             margin: 8px 0;
+            background: linear-gradient(135deg, #a5b4fc, #f0abfc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        #result p { font-size: 0.85rem; color: rgba(255,255,255,0.6); }
+
+        #result p { font-size: 0.82rem; color: rgba(255, 255, 255, 0.5); }
+
         .status-badge {
             display: inline-block;
-            padding: 4px 12px;
+            padding: 4px 14px;
             border-radius: 999px;
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             font-weight: 600;
-            background: rgba(255,255,255,0.15);
+            background: rgba(52, 211, 153, 0.15);
+            color: #6ee7b7;
+            border: 1px solid rgba(52, 211, 153, 0.25);
             margin-bottom: 6px;
         }
-        footer { margin-top: 24px; font-size: 0.75rem; color: rgba(255,255,255,0.3); }
-        footer a { color: rgba(255,255,255,0.4); text-decoration: none; }
+
+        footer {
+            margin-top: 28px;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        footer a {
+            color: rgba(165, 180, 252, 0.5);
+            text-decoration: none;
+            transition: color 0.15s;
+        }
+
+        footer a:hover { color: rgba(165, 180, 252, 0.9); }
     </style>
 </head>
 <body>
@@ -114,7 +205,7 @@
             <span class="queue-num" id="my-queue-num">—</span>
             <span class="status-badge">Menunggu</span>
             <p id="my-queue-time"></p>
-            <p style="margin-top:10px;font-size:0.8rem;color:rgba(255,255,255,0.45);">
+            <p style="margin-top:10px;font-size:0.8rem;color:rgba(255,255,255,0.35);">
                 ✅ Tiket PDF sudah diunduh otomatis
             </p>
         </div>
