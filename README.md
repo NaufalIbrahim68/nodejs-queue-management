@@ -60,7 +60,8 @@ queue-app/
 │
 ├── public/
 │   ├── index.html          # Customer queue page
-│   └── admin.html          # Admin dashboard
+│   ├── admin.html          # Admin dashboard
+│   └── script.js           # Shared frontend JS (customer + admin logic)
 │
 └── utils/
     └── pdfGenerator.js     # PDF ticket generator
