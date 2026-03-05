@@ -5,7 +5,7 @@ let isConnected = false;
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGO_URI, {
-      serverSelectionTimeoutMS: 5000, // Timeout after 5s if MongoDB is not available
+      serverSelectionTimeoutMS: 5000,
     });
     isConnected = true;
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
