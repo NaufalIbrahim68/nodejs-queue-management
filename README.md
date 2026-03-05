@@ -1,84 +1,86 @@
 # 🎫 Queue Management System
 
-A web-based queue management system built for stores and service centers. Customers can take queue numbers and receive PDF tickets, while admins can manage and process queues in realtime.
+A simple queue management system that simulates a queue machine commonly used in stores or service counters, where customers can take a queue number and wait for their turn to be served.
+
+The system provides two interfaces: a customer-facing page for taking queue numbers (with automatic PDF ticket download), and an admin panel for processing queues. All connected screens update in realtime via Socket.IO, so multiple queue machines can run simultaneously without conflicts.
 
 ---
 
-## 📸 Features
+## Features
 
-- **Queue Creation** – Customers click "Masuk Antrian" to join the queue
-- **PDF Ticket Download** – Automatically generates and downloads a PDF ticket with queue number, date, and status
-- **Admin Dashboard** – View all queues, process them, and track statistics
-- **Realtime Updates** – All connected browsers update instantly via Socket.IO (no page refresh needed)
-- **Atomic Queue Numbering** – Uses MongoDB atomic `findOneAndUpdate` + `$inc` to prevent duplicate queue numbers even with simultaneous requests from multiple locations
-- **Auto-initialization** – Works on an empty database; counter document is created automatically via `upsert`
+- Customers can join the queue by clicking "Masuk Antrian" and instantly receive a downloadable PDF ticket
+- Admin panel displays all queues in a table with the ability to mark them as processed
+- Realtime updates across all connected browsers using Socket.IO — no page refresh needed
+- Atomic queue numbering using MongoDB's `findOneAndUpdate` with `$inc` to prevent duplicates, even under concurrent requests
+- Works out of the box on an empty database — the counter document is created automatically via `upsert`
+- In-memory fallback mode when MongoDB is not available, so the server can still run for demo purposes
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
-| Technology   | Purpose                        |
-| ------------ | ------------------------------ |
-| **Node.js**  | Runtime environment            |
-| **Express**  | Web framework & API server     |
-| **MongoDB**  | Database (with Mongoose ODM)   |
-| **Socket.IO**| Realtime bidirectional events   |
-| **PDFKit**   | PDF ticket generation          |
+| Technology      | Purpose                          |
+| --------------- | -------------------------------- |
+| **Node.js**     | Runtime environment              |
+| **Express**     | Web framework & API server       |
+| **MongoDB**     | Database (via Mongoose ODM)      |
+| **Socket.IO**   | Realtime bidirectional events    |
+| **PDFKit**      | PDF ticket generation            |
 | **HTML/CSS/JS** | Frontend (vanilla, no framework) |
 
 ---
 
-## 📁 Folder Structure
+## Folder Structure
 
 ```
 queue-app/
-├── server.js               # Main entry point
-├── migrate.js              # Database migration script
+├── server.js
+├── migrate.js
 ├── package.json
-├── .env                    # Environment variables
+├── .env
 ├── .gitignore
 ├── README.md
 │
 ├── config/
-│   └── db.js               # MongoDB connection
+│   └── db.js
 │
 ├── models/
-│   ├── Queue.js            # Queue document schema
-│   └── Counter.js          # Atomic counter schema
+│   ├── Queue.js
+│   └── Counter.js
 │
 ├── routes/
-│   └── queueRoutes.js      # API route definitions
+│   └── queueRoutes.js
 │
 ├── controllers/
-│   └── queueController.js  # Request handlers
+│   └── queueController.js
 │
 ├── services/
-│   └── queueService.js     # Business logic layer
+│   └── queueService.js
 │
 ├── sockets/
-│   └── socket.js           # Socket.IO event handlers
+│   └── socket.js
 │
 ├── public/
-│   ├── index.html          # Customer queue page
-│   ├── admin.html          # Admin dashboard
-│   └── script.js           # Shared frontend JS (customer + admin logic)
+│   ├── index.html
+│   ├── admin.html
+│   └── script.js
 │
 └── utils/
-    └── pdfGenerator.js     # PDF ticket generator
+    └── pdfGenerator.js
 ```
 
 ---
 
-## 🚀 Installation
+## Installation
 
 ### Prerequisites
 
-- **Node.js** v16+ installed
-- **MongoDB** running locally (or use MongoDB Atlas)
+- **Node.js** v16 or higher
+- **MongoDB** running locally (or a MongoDB Atlas connection string)
 
 ### Steps
 
-1. **Clone or navigate to the project folder**
+1. **Navigate to the project folder**
 
    ```bash
    cd queue-app
@@ -92,7 +94,7 @@ queue-app/
 
 3. **Configure environment variables**
 
-   Create a `.env` file (or edit the existing one):
+   Create a `.env` file in the project root:
 
    ```env
    PORT=3000
@@ -101,33 +103,32 @@ queue-app/
 
 4. **Start MongoDB**
 
-   Make sure MongoDB is running locally:
+   Make sure MongoDB is running on your machine:
 
    ```bash
-   # On Windows (if installed as a service, it runs automatically)
+   # Windows (usually runs as a service automatically)
    # Or start manually:
    mongod
 
-   # On macOS/Linux:
+   # macOS / Linux:
    sudo systemctl start mongod
    ```
 
-5. **Run database migration**
+5. **Run database migration** (optional)
 
    ```bash
-   # Create collections and seed counter
    npm run migrate
 
-   # Or reset everything and re-seed
+   # To reset all data and re-seed:
    npm run migrate:reset
    ```
 
-   > **Note:** The server can start without MongoDB. Migration can be run later when the database is available.
+   > The server can start without running migration first. The counter document will be created automatically on the first queue request.
 
-6. **Run the application**
+6. **Start the application**
 
    ```bash
-   # Development (with auto-restart)
+   # Development (auto-restart on file changes)
    npm run dev
 
    # Production
@@ -141,7 +142,7 @@ queue-app/
 
 ---
 
-## 📡 API Endpoints
+## API Endpoints
 
 ### Create Queue
 
@@ -150,6 +151,7 @@ POST /api/queue
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -182,6 +184,7 @@ PATCH /api/queue/:id
 ```
 
 **Body:**
+
 ```json
 {
   "status": "processed"
@@ -196,16 +199,16 @@ GET /api/queue/:id/ticket
 
 ---
 
-## 🔌 Socket.IO Events
+## Socket.IO Events
 
-| Event           | Direction       | Description                          |
-| --------------- | --------------- | ------------------------------------ |
-| `queue_created` | Server → Client | Emitted when a new queue is created  |
-| `queue_updated` | Server → Client | Emitted when a queue status changes  |
+| Event           | Direction       | Description                         |
+| --------------- | --------------- | ----------------------------------- |
+| `queue_created` | Server → Client | Emitted when a new queue is created |
+| `queue_updated` | Server → Client | Emitted when a queue status changes |
 
 ---
 
-## 🗄️ Database Design
+## Database Design
 
 ### `queues` Collection
 
@@ -238,10 +241,28 @@ const counter = await Counter.findOneAndUpdate(
 );
 ```
 
-This ensures no duplicate queue numbers even with concurrent requests from multiple machines.
+This ensures no duplicate queue numbers are generated, even when multiple machines send requests at the exact same time.
 
 ---
 
-## 📜 License
+## Design Considerations
 
-ISC
+- **MongoDB atomic operations** were chosen for the queue counter because a simple read-then-write approach would risk generating duplicate numbers under concurrent requests. Using `findOneAndUpdate` with `$inc` and `upsert: true` guarantees atomicity and also handles the case where the counter document doesn't exist yet.
+
+- **Socket.IO** was used instead of polling because the queue display needs to feel instant. When a customer takes a number, every connected screen (including other queue machines and the admin panel) should reflect the change immediately without manual refreshing.
+
+- **Separation of concerns** — the codebase is split into controllers (request handling), services (business logic), and models (data schema). This makes it easier to swap out the data layer or add new features without touching unrelated code.
+
+- **PDF ticket generation** simulates the physical ticket that a real queue machine would print. Using PDFKit keeps the dependency lightweight, and the ticket is streamed directly to the browser response without writing temporary files to disk.
+
+- **In-memory fallback** — when MongoDB is unavailable, the service layer automatically switches to an in-memory store. This allows the application to run for demonstration or development purposes without requiring a database setup.
+
+---
+
+## Assumptions
+
+- Queue numbers follow the format `A001`, `A002`, `A003`, etc. Only a single queue type is implemented (no categories like "Teller", "Customer Service", etc.)
+- There is no admin authentication — the admin page is publicly accessible at `/admin`
+- Multiple queue machines (browsers) connect to the same backend API and share a single counter
+- Queue data is not reset daily — a manual reset can be done via `npm run migrate:reset`
+- The PDF ticket is a simple receipt-style document, not a full-page printout
