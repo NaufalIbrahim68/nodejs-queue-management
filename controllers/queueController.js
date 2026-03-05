@@ -1,15 +1,10 @@
 const queueService = require('../services/queueService');
 const { generateTicketPDF } = require('../utils/pdfGenerator');
 
-/**
- * POST /api/queue
- * Create a new queue entry and return it.
- */
 const createQueue = async (req, res) => {
     try {
         const queue = await queueService.createQueue();
 
-        // Emit socket event to all connected clients
         const io = req.app.get('io');
         if (io) {
             io.emit('queue_created', {
@@ -23,7 +18,6 @@ const createQueue = async (req, res) => {
             data: queue,
         });
     } catch (error) {
-        console.error('Error creating queue:', error);
         return res.status(500).json({
             success: false,
             message: 'Failed to create queue',
@@ -32,10 +26,6 @@ const createQueue = async (req, res) => {
     }
 };
 
-/**
- * GET /api/queue
- * Get all queue entries.
- */
 const getAllQueues = async (req, res) => {
     try {
         const queues = await queueService.getAllQueues();
@@ -45,7 +35,6 @@ const getAllQueues = async (req, res) => {
             data: queues,
         });
     } catch (error) {
-        console.error('Error fetching queues:', error);
         return res.status(500).json({
             success: false,
             message: 'Failed to fetch queues',
@@ -54,10 +43,6 @@ const getAllQueues = async (req, res) => {
     }
 };
 
-/**
- * PATCH /api/queue/:id
- * Update queue status.
- */
 const updateQueueStatus = async (req, res) => {
     try {
         const { id } = req.params;
@@ -72,7 +57,6 @@ const updateQueueStatus = async (req, res) => {
 
         const queue = await queueService.updateQueueStatus(id, status);
 
-        // Emit socket event to all connected clients
         const io = req.app.get('io');
         if (io) {
             io.emit('queue_updated', {
@@ -85,7 +69,6 @@ const updateQueueStatus = async (req, res) => {
             data: queue,
         });
     } catch (error) {
-        console.error('Error updating queue:', error);
         return res.status(500).json({
             success: false,
             message: 'Failed to update queue',
@@ -94,10 +77,6 @@ const updateQueueStatus = async (req, res) => {
     }
 };
 
-/**
- * GET /api/queue/latest
- * Get the latest queue number.
- */
 const getLatestQueueNumber = async (req, res) => {
     try {
         const queueNumber = await queueService.getLatestQueueNumber();
@@ -107,7 +86,6 @@ const getLatestQueueNumber = async (req, res) => {
             data: { queueNumber },
         });
     } catch (error) {
-        console.error('Error fetching latest queue:', error);
         return res.status(500).json({
             success: false,
             message: 'Failed to fetch latest queue number',
@@ -116,10 +94,6 @@ const getLatestQueueNumber = async (req, res) => {
     }
 };
 
-/**
- * GET /api/queue/:id/ticket
- * Download PDF ticket for a queue entry.
- */
 const downloadTicket = async (req, res) => {
     try {
         const { id } = req.params;
@@ -135,7 +109,6 @@ const downloadTicket = async (req, res) => {
 
         generateTicketPDF(queue, res);
     } catch (error) {
-        console.error('Error generating ticket:', error);
         return res.status(500).json({
             success: false,
             message: 'Failed to generate ticket',
