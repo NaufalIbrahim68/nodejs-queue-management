@@ -8,12 +8,12 @@ The system provides two interfaces: a customer-facing page for taking queue numb
 
 ## Features
 
-- Customers can join the queue by clicking "Masuk Antrian" and instantly receive a downloadable PDF ticket
-- Admin panel displays all queues in a table with the ability to mark them as processed
-- Realtime updates across all connected browsers using Socket.IO — no page refresh needed
-- Atomic queue numbering using MongoDB's `findOneAndUpdate` with `$inc` to prevent duplicates, even under concurrent requests
-- Works out of the box on an empty database — the counter document is created automatically via `upsert`
-- In-memory fallback mode when MongoDB is not available, so the server can still run for demo purposes
+-Customers can take a queue number by clicking "Masuk Antrian".
+A PDF ticket is generated automatically.
+- Admins can see all queues and mark them as processed.
+- All connected browsers update in realtime using Socket.IO, so no page refresh is required.
+- Queue numbers are generated using a MongoDB atomic counter to avoid duplicates even when multiple machines request a number simultaneously.
+- In-memory fallback mode when MongoDB is not available, so the server can still run for demo purposes.
 
 ---
 
