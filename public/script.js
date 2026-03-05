@@ -80,9 +80,9 @@ async function checkDbStatus() {
     try {
         const res = await fetch('/api/status');
         const data = await res.json();
-        if (data.database === 'disconnected') {
-            const banner = document.getElementById('db-banner');
-            if (banner) banner.style.display = 'block';
+        const banner = document.getElementById('db-banner');
+        if (banner) {
+            banner.style.display = data.database === 'disconnected' ? 'block' : 'none';
         }
     } catch (_) { }
 }

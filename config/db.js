@@ -4,7 +4,7 @@ let isConnected = false;
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI, {
+    const conn = await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/queueapp', {
       serverSelectionTimeoutMS: 5000,
     });
     isConnected = true;
@@ -18,6 +18,6 @@ const connectDB = async () => {
   }
 };
 
-const getConnectionStatus = () => isConnected;
+const getConnectionStatus = () => mongoose.connection.readyState === 1;
 
 module.exports = { connectDB, getConnectionStatus };
