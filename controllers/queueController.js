@@ -97,8 +97,7 @@ const getLatestQueueNumber = async (req, res) => {
 const downloadTicket = async (req, res) => {
     try {
         const { id } = req.params;
-        const Queue = require('../models/Queue');
-        const queue = await Queue.findById(id);
+        const queue = await queueService.getQueueById(id);
 
         if (!queue) {
             return res.status(404).json({

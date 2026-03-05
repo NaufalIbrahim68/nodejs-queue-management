@@ -46,6 +46,11 @@ const mongoService = {
         const latest = await Queue.findOne().sort({ number: -1 });
         return latest ? latest.queueNumber : null;
     },
+
+    async getQueueById(id) {
+        const Queue = require('../models/Queue');
+        return await Queue.findById(id);
+    },
 };
 
 const memService = {
@@ -79,6 +84,10 @@ const memService = {
         const latest = [...memQueues].sort((a, b) => b.number - a.number)[0];
         return latest.queueNumber;
     },
+
+    async getQueueById(id) {
+        return memQueues.find((q) => q._id === id);
+    },
 };
 
 function getService() {
@@ -90,4 +99,5 @@ module.exports = {
     getAllQueues: (...args) => getService().getAllQueues(...args),
     updateQueueStatus: (...args) => getService().updateQueueStatus(...args),
     getLatestQueueNumber: (...args) => getService().getLatestQueueNumber(...args),
+    getQueueById: (...args) => getService().getQueueById(...args),
 };
