@@ -1,18 +1,3 @@
-/**
- * Migration Script - Queue Management System
- * 
- * This script initializes the MongoDB database with the required
- * collections and seed data for the queue system.
- * 
- * Usage:
- *   node migrate.js          → Run migration (create collections + seed counter)
- *   node migrate.js --reset  → Reset all data and re-seed
- * 
- * Prerequisites:
- *   - MongoDB must be running
- *   - .env file must have MONGO_URI configured
- */
-
 require('dotenv').config();
 
 const mongoose = require('mongoose');
@@ -29,14 +14,12 @@ const migrate = async () => {
     console.log('╚══════════════════════════════════════════════╝\n');
 
     try {
-        // Connect to MongoDB
         console.log(`📡 Connecting to MongoDB: ${MONGO_URI}`);
         await mongoose.connect(MONGO_URI, {
             serverSelectionTimeoutMS: 10000,
         });
         console.log('✅ MongoDB Connected!\n');
 
-        // Reset if flag is provided
         if (isReset) {
             console.log('🔄 Resetting database...');
             await Queue.deleteMany({});
@@ -45,13 +28,11 @@ const migrate = async () => {
             console.log('   ✓ Cleared counters collection\n');
         }
 
-        // Ensure collections exist
         console.log('📋 Ensuring collections exist...');
 
         const collections = await mongoose.connection.db.listCollections().toArray();
         const collectionNames = collections.map(c => c.name);
 
-        // Create queues collection if not exists
         if (!collectionNames.includes('queues')) {
             await mongoose.connection.db.createCollection('queues');
             console.log('   ✓ Created "queues" collection');
@@ -59,7 +40,6 @@ const migrate = async () => {
             console.log('   ✓ "queues" collection already exists');
         }
 
-        // Create counters collection if not exists
         if (!collectionNames.includes('counters')) {
             await mongoose.connection.db.createCollection('counters');
             console.log('   ✓ Created "counters" collection');
@@ -67,7 +47,6 @@ const migrate = async () => {
             console.log('   ✓ "counters" collection already exists');
         }
 
-        // Seed counter document (upsert - won't overwrite if exists)
         console.log('\n🌱 Seeding initial data...');
 
         const existingCounter = await Counter.findOne({ name: 'queue' });
@@ -78,13 +57,11 @@ const migrate = async () => {
             console.log(`   ✓ Queue counter already exists (seq: ${existingCounter.seq})`);
         }
 
-        // Ensure indexes
         console.log('\n🔑 Ensuring indexes...');
         await Queue.ensureIndexes();
         await Counter.ensureIndexes();
         console.log('   ✓ Indexes created/verified');
 
-        // Summary
         const queueCount = await Queue.countDocuments();
         const counterDoc = await Counter.findOne({ name: 'queue' });
 
