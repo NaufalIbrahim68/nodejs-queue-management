@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Antrian - Masuk Antrian</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+        }
+        .card {
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 24px;
+            padding: 48px 40px;
+            text-align: center;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+        h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 6px; }
+        .subtitle { color: rgba(255,255,255,0.55); font-size: 0.9rem; margin-bottom: 36px; }
+
+        #latest-display {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 32px;
+        }
+        #latest-display p { font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
+        #latest-number {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #7dd3fc;
+            letter-spacing: 4px;
+        }
+
+        .btn {
+            display: inline-block;
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .btn-primary {
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            color: #fff;
+            box-shadow: 0 8px 24px rgba(99,102,241,0.45);
+        }
+        .btn-primary:hover    { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(99,102,241,0.55); }
+        .btn-primary:active   { transform: translateY(0); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        #result {
+            margin-top: 28px;
+            padding: 20px;
+            border-radius: 16px;
+            background: rgba(99,102,241,0.15);
+            border: 1px solid rgba(99,102,241,0.3);
+            display: none;
+        }
+        #result .queue-num {
+            font-size: 4rem;
+            font-weight: 900;
+            color: #a5b4fc;
+            display: block;
+            margin: 8px 0;
+        }
+        #result p { font-size: 0.85rem; color: rgba(255,255,255,0.6); }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: rgba(255,255,255,0.15);
+            margin-bottom: 6px;
+        }
+        footer { margin-top: 24px; font-size: 0.75rem; color: rgba(255,255,255,0.3); }
+        footer a { color: rgba(255,255,255,0.4); text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🎫 Sistem Antrian</h1>
+        <p class="subtitle">Tekan tombol di bawah untuk mendapat nomor antrian Anda</p>
+
+        <div id="latest-display">
+            <p>Nomor antrian terakhir</p>
+            <div id="latest-number">—</div>
+        </div>
+
+        <button class="btn btn-primary" id="take-btn" onclick="takeQueue()">
+            Masuk Antrian
+        </button>
+
+        <div id="result">
+            <p>Nomor antrian Anda:</p>
+            <span class="queue-num" id="my-queue-num">—</span>
+            <span class="status-badge">Menunggu</span>
+            <p id="my-queue-time"></p>
+            <p style="margin-top:10px;font-size:0.8rem;color:rgba(255,255,255,0.45);">
+                ✅ Tiket PDF sudah diunduh otomatis
+            </p>
+        </div>
+    </div>
+
+    <footer>
+        <a href="/admin">Admin Panel →</a>
+    </footer>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/script.js"></script>
+</body>
+</html>
