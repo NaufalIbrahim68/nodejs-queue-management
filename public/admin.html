@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - Manajemen Antrian</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+        header {
+            background: rgba(30,41,59,0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        header h1 { font-size: 1.1rem; font-weight: 700; }
+        header a {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: color 0.15s;
+        }
+        header a:hover { color: #e2e8f0; }
+
+        #db-banner {
+            display: none;
+            background: rgba(251,191,36,0.1);
+            border-bottom: 1px solid rgba(251,191,36,0.25);
+            color: #fbbf24;
+            padding: 9px 32px;
+            font-size: 0.8rem;
+        }
+
+        .stats {
+            display: flex;
+            gap: 14px;
+            padding: 24px 32px 12px;
+            flex-wrap: wrap;
+        }
+        .stat-card {
+            flex: 1;
+            min-width: 110px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 16px 20px;
+        }
+        .stat-card p    { font-size: 0.72rem; color: #64748b; margin-bottom: 5px; text-transform: uppercase; letter-spacing: .5px; }
+        .stat-card span { font-size: 2rem; font-weight: 900; }
+        .stat-card.total   span { color: #818cf8; }
+        .stat-card.waiting span { color: #fbbf24; }
+        .stat-card.done    span { color: #34d399; }
+
+        .table-wrapper {
+            padding: 4px 32px 48px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        thead tr { background: rgba(255,255,255,0.05); }
+        thead th {
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            color: #64748b;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+        tbody tr {
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: background 0.15s;
+        }
+        tbody tr:hover       { background: rgba(255,255,255,0.03); }
+        tbody tr.processed   { opacity: 0.45; }
+        tbody td { padding: 14px 16px; vertical-align: middle; }
+
+        .queue-num { font-size: 1.3rem; font-weight: 900; color: #a5b4fc; letter-spacing: 2px; }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+        .badge-waiting   { background: rgba(251,191,36,0.15); color: #fbbf24; }
+        .badge-processed { background: rgba(52,211,153,0.15);  color: #34d399; }
+
+        .timestamp { font-size: 0.8rem; color: #64748b; }
+
+        .btn-process {
+            padding: 8px 18px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            color: #fff;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+            white-space: nowrap;
+        }
+        .btn-process:hover    { opacity: 0.85; transform: scale(1.03); }
+        .btn-process:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+
+        .empty-row td {
+            text-align: center;
+            padding: 60px 0;
+            color: #475569;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="db-banner">
+        ⚠️ Mode in-memory aktif — data tidak disimpan permanen (MongoDB tidak terhubung)
+    </div>
+
+    <header>
+        <h1>🔧 Admin Panel — Manajemen Antrian</h1>
+        <a href="/">← Halaman Customer</a>
+    </header>
+
+    <div class="stats">
+        <div class="stat-card total">  <p>Total</p>    <span id="stat-total">0</span></div>
+        <div class="stat-card waiting"><p>Menunggu</p> <span id="stat-waiting">0</span></div>
+        <div class="stat-card done">   <p>Diproses</p> <span id="stat-done">0</span></div>
+    </div>
+
+    <div class="table-wrapper">
+        <table id="queue-table">
+            <thead>
+                <tr>
+                    <th>Queue Number</th>
+                    <th>Status</th>
+                    <th>Timestamp</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="queue-tbody">
+                <tr class="empty-row">
+                    <td colspan="4">Belum ada antrian hari ini 🎉</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/script.js"></script>
+</body>
+</html>
