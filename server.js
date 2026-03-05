@@ -19,16 +19,13 @@ const io = new Server(server, {
     },
 });
 
-// Store io instance on app for use in controllers
 app.set('io', io);
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Health / status check endpoint
 app.get('/api/status', (req, res) => {
     res.json({
         success: true,
@@ -37,10 +34,8 @@ app.get('/api/status', (req, res) => {
     });
 });
 
-// API Routes
 app.use('/api/queue', queueRoutes);
 
-// Page Routes
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
@@ -49,14 +44,11 @@ app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
-// Initialize Socket.IO
 initSocket(io);
 
-// Start server (MongoDB connection is optional)
 const PORT = process.env.PORT || 3000;
 
 const startServer = async () => {
-    // Try to connect to MongoDB (non-blocking)
     const dbConnected = await connectDB();
 
     server.listen(PORT, () => {
